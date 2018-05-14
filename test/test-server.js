@@ -4,7 +4,7 @@ describe('Providing a file as an argument', function () {
  it('should output a copy_FILENAME file', function () {
         assert.equal("");
     });
- it('should do a thingy', function () {
+ it('should equal to the same size as original', function () {
         assert.equal("");
     });
 });

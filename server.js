@@ -9,7 +9,8 @@ const ORANGE = '\x1b[33m%s\x1b[0m'
 const GREEN = '\x1b[32m%s\x1b[0m'
 
 
-let chunks = []
+let data
+let size
 let chunksKB = []
 let lines = 0
 
@@ -78,77 +79,77 @@ class Summary {
   }
 }
 
-const toKB = (bytes) => { parseFloat(bytes / 1000).toFixed(2) }
+const toKB = (bytes) => {
+  return parseFloat(bytes / 1000)
+}
 
 const stream = fs.createReadStream(filePath, 'utf8')
 let filename = path.parse(filePath).base;
+const output = fs.createWriteStream(__dirname + `/output/${filename}`, 'utf8')
 
-const output = fs.createWriteStream(__dirname + `/output/${filename}`, {'flags':'a'})
-//pipe this
-// const logfile = fs.createWriteStream(__dirname + '/logs/logfile.txt', {'flags':'a'})
 
-// stream.pipe(output)
+stream.pipe(output)
 
 
 const time = process.hrtime();
 
 console.log('\n=============================');
-console.log('Sending data from ' + filePath);
-console.log('=============================\n');
+console.log(GREEN,'Sending data from ' + filename);
+console.log('=============================');
 
-stream.on('data', (chunk, err) => {
-  if (err) {
-    console.log(err)
-  } else {
-    console.time('Received in');
-    chunks += Array(chunk)
-    lines = chunks.toString().split("\n").length;
-    console.log(ORANGE,'\n>>>> incoming chunk');
-    console.log(toKB(chunk.length) + ' KB chunk')
-    chunksKB.push(parseInt(toKB(chunk.length)))
-    console.timeEnd('Received in')
-    console.log('');
-    output.write(chunk)
-  }
-})
-
-stream.on('error', err => console.error(err.stack));
-stream.on('end', (chunk) => {
-  console.log('\n=============================');
-  console.log(GREEN,'==== operation completed ====');
-  console.log('=============================\n');
-
-  end = process.hrtime(time)
-  end = parseFloat((end[0] * 1000) + end[1]/1000000).toFixed(3);
-
-  chunksKBTotal = chunksKB.reduce((a, b) => a + b )
-  rate = (end / chunksKBTotal)
-  rate = parseFloat(rate).toFixed(3)
-
-  console.timeEnd('Program operation finished in');
-
-  summaryLog = new Summary(new Date(), filePath, end, chunks.length, rate, chunksKB.length, lines);
-  summaryLog.print()
-
-  if (options != 0) {
-    console.log('Flags: {')
-    if (log) {
-      console.log('  log: ' + log);
-      fs.appendFile(__dirname + '/logs/logfile.txt', summaryLog.toString(), (err) => {
-        if (err) {
-        console.log(err);
-        } else {
-          console.log(GREEN,'\nLog file can be found at logfile.txt \n')
-        }
-      })
+stream
+  .on('data', (chunk, err) => {
+    if (err) {
+      console.log(err)
+    } else {
+      console.time('Received in');
+      data += chunk
+      console.log(ORANGE,'\n>>>> incoming chunk');
+      console.log(toKB(chunk.length) + ' KB chunk')
+      chunksKB.push(toKB(chunk.length))
+      lines = data.toString().split("\n").length;
+      console.timeEnd('Received in')
     }
-    if (test) {
-      console.log('  test: ' + test);
-      // run test file
+  })
+  .on('error', err => console.error(err.stack))
+  .on('end', (chunk) => {
+    console.log('\n=============================');
+    console.log(GREEN,'     Operation completed');
+    console.log('=============================\n');
+
+
+    chunksKBTotal = chunksKB.reduce((a, b) => a + b )
+    end = process.hrtime(time)
+    end = parseFloat((end[0] * 1000) + end[1]/1000000).toFixed(3);
+    rate = (end / chunksKBTotal)
+    rate = parseFloat(rate).toFixed(3)
+
+    console.log(data.length);
+
+
+    console.timeEnd('Program operation finished in');
+    summaryLog = new Summary(new Date(), filePath, end, data.length, rate, chunksKB.length, lines);
+    summaryLog.print()
+
+    if (options != 0) {
+      console.log('Flags: {')
+      if (log) {
+        console.log('  log: ' + log);
+        fs.appendFile(__dirname + '/logs/logfile.txt', summaryLog.toString(), (err) => {
+          if (err) {
+          console.log(err);
+          } else {
+            console.log(GREEN,'\nLog file can be found at logfile.txt \n')
+          }
+        })
+      }
+      if (test) {
+        console.log('  test: ' + test);
+        // run test file
+      }
+      console.log('}');
     }
-    console.log('}');
-  }
-})
+  })
 
 
 // total elapsed time
