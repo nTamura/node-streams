@@ -1,9 +1,13 @@
 const fs = require('fs');
+const path = require('path');
+
 const port = process.env.PORT || 8080;
 const filePath = process.argv[2]
 
+// cosmetic vars
 const ORANGE = '\x1b[33m%s\x1b[0m'
 const GREEN = '\x1b[32m%s\x1b[0m'
+
 
 let chunks = []
 let chunksKB = []
@@ -21,7 +25,7 @@ console.time('Program operation finished in');
 // argv options logic
 if (process.argv.length < 3) {
   console.log('File path parameter is required.');
-  console.log('Try running "node server fileName.txt [options]" \n');
+  console.log('Try running "node server sample/small.txt [options]" \n');
   process.exit(1);
 } else if (process.argv.length > 3) {
   options.forEach((o) => {
@@ -70,17 +74,21 @@ class Summary {
   }
   print() {
     console.log(GREEN,this.toString());
+    !log ? console.log('To save this log, add the -l flag\n') : '';
   }
 }
 
-const toKB = (bytes) => {
-  return parseFloat(bytes / 1000).toFixed(2)
-}
+const toKB = (bytes) => { parseFloat(bytes / 1000).toFixed(2) }
 
 const stream = fs.createReadStream(filePath, 'utf8')
-const output = fs.createWriteStream(__dirname + `/copy_${filePath}`, {'flags':'a'})
+let filename = path.parse(filePath).base;
+
+const output = fs.createWriteStream(__dirname + `/output/${filename}`, {'flags':'a'})
 //pipe this
-const logfile = fs.createWriteStream(__dirname + '/logs/logfile.txt', {'flags':'a'})
+// const logfile = fs.createWriteStream(__dirname + '/logs/logfile.txt', {'flags':'a'})
+
+// stream.pipe(output)
+
 
 const time = process.hrtime();
 
@@ -113,7 +121,7 @@ stream.on('end', (chunk) => {
   end = process.hrtime(time)
   end = parseFloat((end[0] * 1000) + end[1]/1000000).toFixed(3);
 
-  chunksKBTotal = chunksKB.reduce(function(a, b) { return a + b; })
+  chunksKBTotal = chunksKB.reduce((a, b) => a + b )
   rate = (end / chunksKBTotal)
   rate = parseFloat(rate).toFixed(3)
 
@@ -126,9 +134,12 @@ stream.on('end', (chunk) => {
     console.log('Flags: {')
     if (log) {
       console.log('  log: ' + log);
-      fs.appendFile('/logs/logfile.txt', summaryLog.toString(), (err) => {
-        // currently writng 2 log files, duplex this shit
-        console.log(GREEN,'\nLog file can be found at logfile.txt \n')
+      fs.appendFile(__dirname + '/logs/logfile.txt', summaryLog.toString(), (err) => {
+        if (err) {
+        console.log(err);
+        } else {
+          console.log(GREEN,'\nLog file can be found at logfile.txt \n')
+        }
       })
     }
     if (test) {
