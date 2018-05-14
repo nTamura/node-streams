@@ -1,11 +1,11 @@
 {
-  "name": "stream-node",
+  "name": "duplex-stream-node",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "mocha || true",
-    "start": "node server sample/big.txt -l -v"
+    "test": "echo \"\\033[34mDefault test script disabled\nRun test by using the -t argument\n\n\"",
+    "start": "node server big.txt -t -l"
   },
   "author": "",
   "license": "ISC",
