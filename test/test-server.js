@@ -1,19 +1,41 @@
-// require
+const assert = require('chai').assert;
+const { toKB, filePath, output } = require('../server.js')
 
-describe('Providing a file as an argument', function () {
- it('should output a copy_FILENAME file', function () {
-        assert.equal("");
-    });
- it('should equal to the same size as original', function () {
-        assert.equal("");
-    });
-});
+const fs = require('fs');
+const path = require('path');
 
-describe('Providing arguments via terminal', function () {
- it('should append to a logfile', function () {
-        assert.equal("");
+
+describe('Server', () => {
+
+  describe('toKB()', () => {
+    it('should return a number', () => {
+      let result = toKB(1000)
+      assert.typeOf(result,'number')
     });
- it('should run a test file', function () {
-        assert.equal("");
-    });
+  });
+
+  describe("Stream", () => {
+    it('should do something', () => {
+      const stream = fs.createReadStream(filePath)
+      stream.pipe(output)
+
+    })
+  })
 });
+//     it('should output a copy_FILENAME file', () => {
+//       assert.equal();
+//     });
+//     it('should equal to the same size as original', () => {
+//       assert.equal("");
+//     });
+//   });
+// });
+//
+// describe('Providing arguments via terminal', () => {
+//   it('should append to a logfile', () => {
+//     assert.equal("");
+//   });
+//   it('should run a test file', () => {
+//     assert.equal("");
+//   });
+// });

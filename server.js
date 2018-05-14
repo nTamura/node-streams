@@ -2,13 +2,21 @@ const fs = require('fs');
 const path = require('path');
 
 const port = process.env.PORT || 8080;
-const filePath = process.argv[2]
+let filePath = process.argv[2]
 
 // cosmetic vars
 const YELLOW = '\x1b[33m%s\x1b[0m'
 const GREEN = '\x1b[32m%s\x1b[0m'
 const BLUE = '\x1b[34m%s\x1b[0m'
 const RED = '\x1b[31m%s\x1b[0m'
+
+const Mocha = require('mocha')
+const mocha = new Mocha(
+  {
+    fullTrace:true,
+    useColors:true
+  }
+);
 
 
 let data
@@ -30,6 +38,7 @@ if (process.argv.length < 3) {
   console.log('File path parameter is required.');
   console.log('Try running "node server sample/small.txt [options]" \n');
   process.exit(1);
+  // filePath = 'sample/small.txt'
 } else if (process.argv.length > 3) {
   options.forEach((o) => {
     switch (o) {
@@ -161,10 +170,16 @@ stream
       }
       if (test) {
         console.log('Run test file \n');
+        mocha.run()
+
       }
     }
   })
 
+  module.exports = {
+    toKB,
+    filePath, output,
+  }
 
 // total elapsed time
 // total length bytes
