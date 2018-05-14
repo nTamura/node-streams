@@ -5,8 +5,10 @@ const port = process.env.PORT || 8080;
 const filePath = process.argv[2]
 
 // cosmetic vars
-const ORANGE = '\x1b[33m%s\x1b[0m'
+const YELLOW = '\x1b[33m%s\x1b[0m'
 const GREEN = '\x1b[32m%s\x1b[0m'
+const BLUE = '\x1b[34m%s\x1b[0m'
+const RED = '\x1b[31m%s\x1b[0m'
 
 
 let data
@@ -75,7 +77,7 @@ class Summary {
   }
   print() {
     console.log(GREEN,this.toString());
-    !log ? console.log('To save this log, add the -l flag\n') : '';
+    if (!log) console.log('To save this log, add the -l flag\n');
   }
 }
 
@@ -83,9 +85,9 @@ const toKB = (bytes) => {
   return parseFloat(bytes / 1000)
 }
 
-const stream = fs.createReadStream(filePath, 'utf8')
+const stream = fs.createReadStream(filePath)
 let filename = path.parse(filePath).base;
-const output = fs.createWriteStream(__dirname + `/output/${filename}`, 'utf8')
+const output = fs.createWriteStream(__dirname + `/output/${filename}`)
 
 
 stream.pipe(output)
@@ -104,7 +106,7 @@ stream
     } else {
       console.time('Received in');
       data += chunk
-      console.log(ORANGE,'\n>>>> incoming chunk');
+      console.log(YELLOW,'\n>>>> incoming chunk');
       console.log(toKB(chunk.length) + ' KB chunk')
       chunksKB.push(toKB(chunk.length))
       lines = data.toString().split("\n").length;
@@ -117,37 +119,49 @@ stream
     console.log(GREEN,'     Operation completed');
     console.log('=============================\n');
 
-
     chunksKBTotal = chunksKB.reduce((a, b) => a + b )
-    end = process.hrtime(time)
-    end = parseFloat((end[0] * 1000) + end[1]/1000000).toFixed(3);
-    rate = (end / chunksKBTotal)
+    endTime = process.hrtime(time)
+    endTime = parseFloat((endTime[0] * 1000) + endTime[1]/1000000).toFixed(3);
+    rate = (endTime / chunksKBTotal)
     rate = parseFloat(rate).toFixed(3)
-
-    console.log(data.length);
 
 
     console.timeEnd('Program operation finished in');
-    summaryLog = new Summary(new Date(), filePath, end, data.length, rate, chunksKB.length, lines);
+
+    summaryLog = new Summary(
+      new Date(),
+      filename,
+      endTime,
+      data.length,
+      rate,
+      chunksKB.length,
+      lines
+    );
+
     summaryLog.print()
 
     if (options != 0) {
-      console.log('Flags: {')
+      if (verbose) {
+        console.log('Flags: {')
+          if (log) { console.log('  log: ' + YELLOW, log)}
+          if (test) { console.log('  test: ' + YELLOW, test)}
+          if (verbose) { console.log('  verbose: ' + YELLOW, verbose)}
+        console.log('}');
+        console.log('\nOutput file can be found at: ');
+        console.log(BLUE,__dirname + `/output/${filename}`);
+
+        if (log) {
+          console.log('\nLog file can be found at ')
+          console.log(BLUE, __dirname + '/logs/logfile.txt')
+        }
+      }
+
       if (log) {
-        console.log('  log: ' + log);
-        fs.appendFile(__dirname + '/logs/logfile.txt', summaryLog.toString(), (err) => {
-          if (err) {
-          console.log(err);
-          } else {
-            console.log(GREEN,'\nLog file can be found at logfile.txt \n')
-          }
-        })
+        fs.appendFileSync(__dirname + '/logs/logfile.txt', summaryLog)
       }
       if (test) {
-        console.log('  test: ' + test);
-        // run test file
+        console.log('Run test file \n');
       }
-      console.log('}');
     }
   })
 
