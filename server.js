@@ -94,6 +94,17 @@ const toKB = (bytes) => {
   return parseFloat(bytes / 1000)
 }
 
+if (!fs.existsSync(filePath)) {
+  console.log(RED,`\n  FILEPATH ERROR`);
+  console.log('==================');
+  console.log(RED,`"${filePath}" is not a valid file`);
+  console.log(RED,'Check the file path and extension \n');
+  console.log('eg: "sample/small.txt"');
+  console.log('eg: "../../somewhere/else.txt"\n');
+  console.log('Program will now exit... \n\n');
+  process.exit(1);
+}
+
 const stream = fs.createReadStream(filePath)
 let filename = path.parse(filePath).base;
 const output = fs.createWriteStream(__dirname + `/output/${filename}`)
