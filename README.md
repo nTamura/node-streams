@@ -18,6 +18,7 @@ example: `node server ../../someFile.js -l`
 
 ### Available options:
 ![screen](https://raw.githubusercontent.com/nTamura/node-streams/master/img/screen2.png)
+
 The following custom arguments are provided by argv:
 - `-v` Verbose provides extra informational text
 - `-l` Log appends to the logfile at `/logs/logfile.txt`
