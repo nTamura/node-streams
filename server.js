@@ -35,7 +35,6 @@ if (process.argv.length < 3) {
   console.log('File path parameter is required.');
   console.log('Try running "node server sample/small.txt [options]" \n');
   process.exit(1);
-  // filePath = 'sample/small.txt'
 } else if (process.argv.length > 3) {
   options.forEach((flag) => {
     switch (flag) {
@@ -65,7 +64,7 @@ class Summary {
     this.chunks = chunks;
     this.lines = lines;
   }
-  toString() {
+  logMsg() {
     return (`
       =======================================
       ============= LOG OUTPUT ==============
@@ -82,7 +81,7 @@ class Summary {
     `)
   }
   print() {
-    console.log(GREEN,this.toString());
+    console.log(GREEN,this.logMsg());
     if (!log) console.log('To save this log, add the -l flag\n');
   }
 }
@@ -91,6 +90,7 @@ const toKB = (bytes) => {
   return parseFloat(bytes / 1000)
 }
 
+// if no filename is passed
 if (!fs.existsSync(filePath)) {
   console.log(RED,`\n  FILEPATH ERROR`);
   console.log('==================');
@@ -107,7 +107,6 @@ const stream = fs.createReadStream(filePath)
 const filename = path.parse(filePath).base;
 const output = fs.createWriteStream(__dirname + `/output/${filename}`)
 stream.pipe(output)
-
 
 console.log('\n=============================');
 console.log(GREEN,'Sending data from ' + filename);
@@ -168,7 +167,6 @@ stream
           console.log('\nNo log argument present, logfile was not created\n');
         }
       }
-
       if (log) {
         fs.appendFileSync(__dirname + '/logs/logfile.txt', summaryLog)
       }
@@ -179,9 +177,8 @@ stream
         mocha.run();
       }
     }
-
   })
 
 module.exports = {
-  toKB, filePath, output,filename
+  toKB, filePath, output, filename
 }
