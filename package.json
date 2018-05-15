@@ -1,5 +1,5 @@
 {
-  "name": "duplex-stream-node",
+  "name": "node-streams",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
