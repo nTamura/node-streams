@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"\\033[34mDefault test script disabled\nRun test by using the -t argument\n\n\"",
-    "start": "node server big.txt -t -l"
+    "start": "node server sample/song_of_storms.mp3 -t -l -v"
   },
   "author": "",
   "license": "ISC",

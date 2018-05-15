@@ -9,23 +9,21 @@ The custom start script will run the default script:
 
 `node server sample/song_of_storms.mp3 -t -l -v`
 
-<!-- insert image -->
-
 ### Custom Start
 You can tell the program to consume your own file by specifying the path. Otherwise you may use the test files in `/sample`.
 
 `node server <FILE PATH> [OPTIONS]`
 
 example: `node server ../../someFile.js -l`
-![screen](https://raw.githubusercontent.com/nTamura/node-streams/master/img/screen2.png)
 
 ### Available options:
+![screen](https://raw.githubusercontent.com/nTamura/node-streams/master/img/screen2.png)
 The following custom arguments are provided by argv:
 - `-v` Verbose provides extra informational text
 - `-l` Log appends to the logfile at `/logs/logfile.txt`
 - `-t` Test runs the test file at `/tests/server-test.js` using Mocha
 
-#### Logfile
+### Logfile
 - timestamp
 - total elapsed time
 - total length in bytes
@@ -34,3 +32,4 @@ The following custom arguments are provided by argv:
 
 ### Testing
 ![screen](https://raw.githubusercontent.com/nTamura/node-streams/master/img/screen3.png)
+Testing provided by passing the `-t` argument.
