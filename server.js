@@ -13,16 +13,13 @@ const RED = '\x1b[31m%s\x1b[0m'
 // Mocha constructor
 const Mocha = require('mocha')
 const mocha = new Mocha({
-  reporter: 'list',
+  reporter: 'spec',
   useColors: true,
   fullTrace: true,
 });
 
-
 let data
-let size
 let chunksKB = []
-let lines = 0
 
 // argv option bools
 const options = process.argv.slice(3)
@@ -43,18 +40,18 @@ if (process.argv.length < 3) {
   options.forEach((flag) => {
     switch (flag) {
       case '-l':
-        log = true
+        log = true;
         break;
       case '-t':
-        test = true
+        test = true;
         break;
       case '-v':
-        verbose = true
+        verbose = true;
         break;
       default:
         console.log(RED,'\nERROR: Ommitted unrecognized option from user argument.');
     }
-  })
+  });
 }
 
 // summary logfile class
@@ -82,7 +79,7 @@ class Summary {
       Number of chunks received: ${this.chunks}
       Total number of lines: ${this.lines}
 
-    `)
+    `);
   }
   print() {
     console.log(GREEN,this.toString());
@@ -91,8 +88,8 @@ class Summary {
 }
 
 const toKB = (bytes) => {
-  return parseFloat(bytes / 1000)
-}
+  return parseFloat(bytes / 1000);
+};
 
 if (!fs.existsSync(filePath)) {
   console.log(RED,`\n  FILEPATH ERROR`);
@@ -105,14 +102,12 @@ if (!fs.existsSync(filePath)) {
   process.exit(1);
 }
 
-const stream = fs.createReadStream(filePath)
-const filename = path.parse(filePath).base;
-const output = fs.createWriteStream(__dirname + `/output/${filename}`)
-
-stream.pipe(output)
-
-
 const time = process.hrtime();
+const stream = fs.createReadStream(filePath);
+const filename = path.parse(filePath).base;
+const output = fs.createWriteStream(__dirname + `/output/${filename}`);
+stream.pipe(output);
+
 
 console.log('\n=============================');
 console.log(GREEN,'Sending data from ' + filename);
@@ -121,31 +116,27 @@ console.log('=============================');
 stream
   .on('data', (chunk, err) => {
     if (err) {
-      console.log(err)
+      console.log(err);
     } else {
       console.time('Received in');
-      data += chunk
+      data += chunk;
       console.log(YELLOW,'\n>>>> incoming chunk');
-      console.log(toKB(chunk.length) + ' KB chunk')
-      chunksKB.push(toKB(chunk.length))
-      lines = data.toString().split("\n").length;
-      console.timeEnd('Received in')
+      console.log(toKB(chunk.length) + ' KB chunk');
+      chunksKB.push(toKB(chunk.length));
+      console.timeEnd('Received in');
     }
   })
-  .on('error', err => console.error(err.stack))
+  .on('error', err => console.error(err.stack));
   .on('end', (chunk) => {
     console.log('\n=============================');
     console.log(GREEN,'     Operation completed');
     console.log('=============================\n');
 
-    chunksKBTotal = chunksKB.reduce((a, b) => a + b )
-    endTime = process.hrtime(time)
+    chunksKBTotal = chunksKB.reduce((a, b) => a + b );
+    endTime = process.hrtime(time);
     endTime = parseFloat((endTime[0] * 1000) + endTime[1]/1000000).toFixed(3);
-    rate = (endTime / chunksKBTotal)
-    rate = parseFloat(rate).toFixed(3)
-
-
-    console.timeEnd('Program operation finished in');
+    rate = (endTime / chunksKBTotal);
+    rate = parseFloat(rate).toFixed(3);
 
     summaryLog = new Summary(
       new Date(),
@@ -154,67 +145,42 @@ stream
       data.length,
       rate,
       chunksKB.length,
-      lines
+      data.toString().split("\n").length
     );
 
-    summaryLog.print()
+    console.timeEnd('Program operation finished in');
+    summaryLog.print();
 
     // argument actions
     if (options != 0) {
       if (verbose) {
-        console.log('Argument flags: {')
-          if (log) { console.log('  log: ' + YELLOW, log)}
-          if (test) { console.log('  test: ' + YELLOW, test)}
-          if (verbose) { console.log('  verbose: ' + YELLOW, verbose)}
+        console.log('Argument flags: {');
+          if (log) { console.log('  log: ' + YELLOW, log);}
+          if (test) { console.log('  test: ' + YELLOW, test);}
+          if (verbose) { console.log('  verbose: ' + YELLOW, verbose);}
         console.log('}');
         console.log('\nOutput file can be found at: ');
         console.log(BLUE,__dirname + `/output/${filename}`);
-
         if (log) {
-          console.log('\nLog file can be found at ')
-          console.log(BLUE, __dirname + '/logs/logfile.txt')
+          console.log('\nLog file can be found at ');
+          console.log(BLUE, __dirname + '/logs/logfile.txt');
         } else {
-          console.log('\nNo log argument present, logfile was not created');
+          console.log('\nNo log argument present, logfile was not created\n');
         }
       }
 
       if (log) {
-        fs.appendFileSync(__dirname + '/logs/logfile.txt', summaryLog)
+        fs.appendFileSync(__dirname + '/logs/logfile.txt', summaryLog);
       }
       if (test) {
-        console.log('\nTest argument invoked, running default test file');
+        console.log('Test argument invoked, running default test file');
         console.log('Results from tests: ');
-        mocha.addFile(__dirname + '/test/test-server.js')
+        mocha.addFile(__dirname + '/test/test-server.js');
         mocha.run();
-        // mocha.reporter('list').run();
-
       }
     }
-  })
+  });
 
-  module.exports = {
-    toKB,
-    filePath, output,filename
-
-  }
-
-// total elapsed time
-// total length bytes
-// total lines
-// rate of input stream in bytes/sec
-
-// $ tail -f mylogfile | myscript --verbose
-
-// Try to avoid using third-party modules
-// Stick to node.js core APIs
-// Write a test to confirm your module works correctly
-
-// Create a duplex stream
-// consumes line-separated text
-// outputs objects with keys for the elapsed time
-// should have total length in bytes, and total lines.
-
-// Create a stream that takes these objects and outputs one-line summary reports (human readable). The report should include the throughput rate of the input stream in bytes/sec.
-//
-// Use your new streams in a script that reads stdin (such as tailing a log file) and report on the number of lines and growth rate of the file.
-// points if your script is configurable via argv (use your imagination).
+module.exports = {
+  toKB, filePath, output,filename
+};
