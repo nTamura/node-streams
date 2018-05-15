@@ -10,13 +10,13 @@ const GREEN = '\x1b[32m%s\x1b[0m'
 const BLUE = '\x1b[34m%s\x1b[0m'
 const RED = '\x1b[31m%s\x1b[0m'
 
+// Mocha constructor
 const Mocha = require('mocha')
-const mocha = new Mocha(
-  {
-    fullTrace:true,
-    useColors:true
-  }
-);
+const mocha = new Mocha({
+  reporter: 'list',
+  useColors: true,
+  fullTrace: true,
+});
 
 
 let data
@@ -40,19 +40,19 @@ if (process.argv.length < 3) {
   process.exit(1);
   // filePath = 'sample/small.txt'
 } else if (process.argv.length > 3) {
-  options.forEach((o) => {
-    switch (o) {
-     case '-l':
-       log = true
-       break;
-     case '-t':
-       test = true
-       break;
-     case '-v':
-       verbose = true
-       break;
-     default:
-       console.log('Unrecognized option from user.');
+  options.forEach((flag) => {
+    switch (flag) {
+      case '-l':
+        log = true
+        break;
+      case '-t':
+        test = true
+        break;
+      case '-v':
+        verbose = true
+        break;
+      default:
+        console.log(RED,'\nERROR: Ommitted unrecognized option from user argument.');
     }
   })
 }
@@ -106,9 +106,8 @@ if (!fs.existsSync(filePath)) {
 }
 
 const stream = fs.createReadStream(filePath)
-let filename = path.parse(filePath).base;
+const filename = path.parse(filePath).base;
 const output = fs.createWriteStream(__dirname + `/output/${filename}`)
-
 
 stream.pipe(output)
 
@@ -160,9 +159,10 @@ stream
 
     summaryLog.print()
 
+    // argument actions
     if (options != 0) {
       if (verbose) {
-        console.log('Flags: {')
+        console.log('Argument flags: {')
           if (log) { console.log('  log: ' + YELLOW, log)}
           if (test) { console.log('  test: ' + YELLOW, test)}
           if (verbose) { console.log('  verbose: ' + YELLOW, verbose)}
@@ -173,6 +173,8 @@ stream
         if (log) {
           console.log('\nLog file can be found at ')
           console.log(BLUE, __dirname + '/logs/logfile.txt')
+        } else {
+          console.log('\nNo log argument present, logfile was not created');
         }
       }
 
@@ -180,8 +182,11 @@ stream
         fs.appendFileSync(__dirname + '/logs/logfile.txt', summaryLog)
       }
       if (test) {
-        console.log('Run test file \n');
-        mocha.run()
+        console.log('\nTest argument invoked, running default test file');
+        console.log('Results from tests: ');
+        mocha.addFile(__dirname + '/test/test-server.js')
+        mocha.run();
+        // mocha.reporter('list').run();
 
       }
     }
@@ -189,7 +194,8 @@ stream
 
   module.exports = {
     toKB,
-    filePath, output,
+    filePath, output,filename
+
   }
 
 // total elapsed time

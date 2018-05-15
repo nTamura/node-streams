@@ -21,7 +21,7 @@ example: `node server ../../someFile.js -l`
 The following custom arguments are provided by argv:
 - `-v` Verbose provides extra informational text
 - `-l` Log appends to the logfile at `/logs/logfile.txt`
-- `-t` Test runs the test file at `/tests/server-test.js`
+- `-t` Test runs the test file at `/tests/server-test.js` using Mocha
 
 #### Logfile
 - timestamp
