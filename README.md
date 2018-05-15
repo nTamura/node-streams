@@ -1,5 +1,6 @@
 # Node Streams
 This project consumes a file and writes the file to a different location. It logs the read and write information to an optional log file, and reports the output to the terminal.
+![screen](https://raw.githubusercontent.com/nTamura/node-stream/master/img/screen1.png)
 
 ### Starting the project
 To start the program, copy `npm install && npm start` into the terminal
@@ -16,6 +17,7 @@ You can tell the program to consume your own file by specifying the path. Otherw
 `node server <FILE PATH> [OPTIONS]`
 
 example: `node server ../../someFile.js -l`
+![screen](https://raw.githubusercontent.com/nTamura/node-stream/master/img/screen1.png)
 
 ### Available options:
 The following custom arguments are provided by argv:
@@ -29,3 +31,6 @@ The following custom arguments are provided by argv:
 - total length in bytes
 - rate of input stream in bytes/ms
 - total lines
+
+### Testing
+![screen](https://raw.githubusercontent.com/nTamura/node-stream/master/img/screen3.png)
