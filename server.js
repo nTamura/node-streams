@@ -104,12 +104,12 @@ if (!fs.existsSync(filePath)) {
 
 const time = process.hrtime();
 const outputdir = '/output'
-const logdir = '/logs'
+const logsdir = '/logs'
 !fs.existsSync(__dirname + outputdir) && fs.mkdirSync(__dirname + outputdir)
 !fs.existsSync(__dirname + logsdir) && fs.mkdirSync(__dirname + logsdir)
 const stream = fs.createReadStream(filePath)
 const filename = path.parse(filePath).base;
-const output = fs.createWriteStream(__dirname + `${dir}/${filename}`)
+const output = fs.createWriteStream(__dirname + `${outputdir}/${filename}`)
 stream.pipe(output)
 
 console.log('\n=============================');
