@@ -103,9 +103,11 @@ if (!fs.existsSync(filePath)) {
 }
 
 const time = process.hrtime();
+const dir = '/output'
+if (!fs.existsSync(__dirname + dir)){ fs.mkdirSync(__dirname + dir)}
 const stream = fs.createReadStream(filePath)
 const filename = path.parse(filePath).base;
-const output = fs.createWriteStream(__dirname + `/output/${filename}`)
+const output = fs.createWriteStream(__dirname + `${dir}/${filename}`)
 stream.pipe(output)
 
 console.log('\n=============================');
